@@ -64,16 +64,15 @@ namespace BlueBack.ThreadRequest
 			return == false : データなし。
 
 		*/
-		public bool Dequeue(REQUESTITEM a_requestitem)
+		public REQUESTITEM Dequeue()
 		{
 			lock(this.thread.lockobject){
 				if(this.list.Count > 0){
-					a_requestitem = this.list.Dequeue();
-					return true;
+					return this.list.Dequeue();
 				}
 			}
 
-			return false;
+			return null;
 		}
 	}
 }

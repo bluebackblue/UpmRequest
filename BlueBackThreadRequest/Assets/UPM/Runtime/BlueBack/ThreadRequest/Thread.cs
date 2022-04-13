@@ -169,10 +169,12 @@ namespace BlueBack.ThreadRequest
 					break;
 				}
 
-				REQUESTITEM t_requestitem = null;
+				REQUESTITEM t_requestitem;
 
 				try{
-					if(this.requestlist.Dequeue(t_requestitem) == true){
+					t_requestitem = this.requestlist.Dequeue();
+					if(t_requestitem != null){
+
 						//ThreadExecute
 						if(this.execute != null){
 							this.execute.ThreadExecute(t_requestitem,ref this.cancel);
@@ -180,24 +182,33 @@ namespace BlueBack.ThreadRequest
 
 						//MemoryBarrier
 						System.Threading.Thread.MemoryBarrier();
+
 					}else{
 						t_requestitem = null;
 					}
 				}catch(System.Exception t_exception){
+
 					#if(DEF_BLUEBACK_THREADREQUEST_ASSERT)
 					DebugTool.Assert(false,t_exception.Message);
 					#endif
+
+					t_requestitem = null;
+
 				}
 
 				if(t_requestitem  != null){
 					if(this.context != null){
 						try{
+
 							//Inner_AfterContextExecute
 							this.context.Post(this.Inner_AfterContextExecute,t_requestitem);
+
 						}catch(System.Exception t_exception){
+
 							#if(DEF_BLUEBACK_THREADREQUEST_ASSERT)
 							DebugTool.Assert(false,t_exception.Message);
 							#endif
+
 						}
 					}
 				}
