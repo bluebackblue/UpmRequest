@@ -53,9 +53,9 @@ namespace BlueBack.ThreadRequest
 
 		/** 発行。
 		*/
-		public void Request(in REQUESTITEM a_requestitem)
+		public void Request(REQUESTITEM a_requestitem)
 		{
-			this.requestlist.Enqueue(in a_requestitem);
+			this.requestlist.Enqueue(a_requestitem);
 		}
 	}
 }

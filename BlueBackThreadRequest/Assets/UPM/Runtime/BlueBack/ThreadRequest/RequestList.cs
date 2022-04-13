@@ -48,7 +48,7 @@ namespace BlueBack.ThreadRequest
 
 		/** 設定。
 		*/
-		public void Enqueue(in REQUESTITEM a_requestitem)
+		public void Enqueue(REQUESTITEM a_requestitem)
 		{
 			//Enqueue
 			lock(this.thread.lockobject){
@@ -64,14 +64,12 @@ namespace BlueBack.ThreadRequest
 			return == false : データなし。
 
 		*/
-		public bool Dequeue(out REQUESTITEM a_requestitem)
+		public bool Dequeue(REQUESTITEM a_requestitem)
 		{
 			lock(this.thread.lockobject){
 				if(this.list.Count > 0){
 					a_requestitem = this.list.Dequeue();
 					return true;
-				}else{
-					a_requestitem = default;
 				}
 			}
 
