@@ -14,7 +14,7 @@ namespace BlueBack.ThreadRequest
 	/** RequestList
 	*/
 	public sealed class RequestList<REQUESTITEM> : System.IDisposable
-		where REQUESTITEM : struct
+		where REQUESTITEM : class
 	{
 		/** [cache]thread
 		*/
@@ -39,24 +39,14 @@ namespace BlueBack.ThreadRequest
 		*/
 		public void Dispose()
 		{
+			//thread
+			this.thread = null;
+
+			//list
+			this.list = null;
 		}
 
-		/** Dequeue
-		*/
-		public bool Dequeue(out REQUESTITEM a_requestitem)
-		{
-			lock(this.thread.lockobject){
-				if(this.list.Count > 0){
-					a_requestitem = this.list.Dequeue();
-					return true;
-				}
-			}
-
-			a_requestitem = default;
-			return false;
-		}
-
-		/** Enqueue
+		/** 設定。
 		*/
 		public void Enqueue(in REQUESTITEM a_requestitem)
 		{
@@ -67,6 +57,25 @@ namespace BlueBack.ThreadRequest
 
 			//Wakeup
 			this.thread.Wakeup();
+		}
+
+		/** 取得。
+
+			return == false : データなし。
+
+		*/
+		public bool Dequeue(out REQUESTITEM a_requestitem)
+		{
+			lock(this.thread.lockobject){
+				if(this.list.Count > 0){
+					a_requestitem = this.list.Dequeue();
+					return true;
+				}else{
+					a_requestitem = default;
+				}
+			}
+
+			return false;
 		}
 	}
 }

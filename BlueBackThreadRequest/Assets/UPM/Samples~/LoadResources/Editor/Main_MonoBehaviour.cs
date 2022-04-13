@@ -10,14 +10,10 @@ namespace BlueBack.PoolList.Samples.Simple
     {
 		/** Item
 		*/
-		public struct Item
+		public class Item
 		{
 			public string log;
 		}
-
-		/** log_prefix
-		*/
-		public string log_prefix;
 
 		/** threadrequest
 		*/
@@ -27,12 +23,14 @@ namespace BlueBack.PoolList.Samples.Simple
 		*/
 		private void Awake()
 		{
-			this.log_prefix = "xxx";
+			//initparam
+			ThreadRequest.InitParam<Main_MonoBehaviour.Item> t_initparam = ThreadRequest.InitParam<Main_MonoBehaviour.Item>.CreateDefault();
+			{
+				t_initparam.execute = this;
+			}
 
 			//threadrequest
-			this.threadrequest = new ThreadRequest.ThreadRequest<Main_MonoBehaviour.Item>(new ThreadRequest.InitParam<Main_MonoBehaviour.Item>(){
-				execute = this,
-			});
+			this.threadrequest = new ThreadRequest.ThreadRequest<Main_MonoBehaviour.Item>(in t_initparam);
 
 			//StartCoroutine
 			this.StartCoroutine(this.CoroutineMain());
@@ -43,33 +41,37 @@ namespace BlueBack.PoolList.Samples.Simple
 		public System.Collections.IEnumerator CoroutineMain()
 		{
 			//Request
-			UnityEngine.Debug.Log("Request");
+			UnityEngine.Debug.Log("Request : start");
 			this.threadrequest.Request(new Item(){
-				log = "1",
+				log = "log1",
 			});
+			UnityEngine.Debug.Log("Request : end");
 
 			//Request
-			UnityEngine.Debug.Log("Request");
+			UnityEngine.Debug.Log("Request : start");
 			this.threadrequest.Request(new Item(){
-				log = "2",
+				log = "log2",
 			});
+			UnityEngine.Debug.Log("Request : end");
 
 			yield return null;
 
 			//Request
-			UnityEngine.Debug.Log("Request");
+			UnityEngine.Debug.Log("Request : start");
 			this.threadrequest.Request(new Item(){
-				log = "3",
+				log = "log3",
 			});
+			UnityEngine.Debug.Log("Request : end");
 
 			//Sleep
 			System.Threading.Thread.Sleep(1000);
 
 			//Request
-			UnityEngine.Debug.Log("Request");
+			UnityEngine.Debug.Log("Request : start");
 			this.threadrequest.Request(new Item(){
-				log = "4",
+				log = "log4",
 			});
+			UnityEngine.Debug.Log("Request : end");
 
 			yield break;
 		}
@@ -82,14 +84,21 @@ namespace BlueBack.PoolList.Samples.Simple
 			this.threadrequest.Dispose();
 		}
 
-		/** [BlueBack.ThreadRequest.Execute_Base<REQUESTITEM>]Load
+		/** [BlueBack.ThreadRequest.Execute_Base<REQUESTITEM>]ThreadExecute
 
 			System.Threading.Interlocked.Read(ref a_cancel) == 1 : キャンセルリクエストあり。
 
 		*/
-		public void Load(in Main_MonoBehaviour.Item a_requestitem,ref long a_cancel)
+		public void ThreadExecute(Main_MonoBehaviour.Item a_requestitem,ref long a_cancel)
 		{
-			UnityEngine.Debug.Log(this.log_prefix + " : " + a_requestitem.log);
+			UnityEngine.Debug.Log(string.Format("ThreadExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_requestitem.log));
+		}
+
+		/** [BlueBack.ThreadRequest.Execute_Base<REQUESTITEM>]AfterContextExecute
+		*/
+		public void AfterContextExecute(Main_MonoBehaviour.Item a_requestitem)
+		{
+			UnityEngine.Debug.Log(string.Format("AfterContextExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_requestitem.log));
 		}
 	}
 }

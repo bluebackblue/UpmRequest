@@ -14,8 +14,12 @@ namespace BlueBack.ThreadRequest
 	/** InitParam
 	*/
 	public struct InitParam<REQUESTITEM>
-		where REQUESTITEM : struct
+		where REQUESTITEM : class
 	{
+		/** context
+		*/
+		public System.Threading.SynchronizationContext context;
+
 		/** execute
 		*/
 		public Execute_Base<REQUESTITEM> execute;
@@ -25,6 +29,7 @@ namespace BlueBack.ThreadRequest
 		public static InitParam<REQUESTITEM> CreateDefault()
 		{
 			return new InitParam<REQUESTITEM>(){
+				context = System.Threading.SynchronizationContext.Current,
 				execute = null,
 			};
 		}

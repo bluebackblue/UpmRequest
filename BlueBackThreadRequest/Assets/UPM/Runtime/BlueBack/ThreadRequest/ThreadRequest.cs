@@ -14,12 +14,8 @@ namespace BlueBack.ThreadRequest
 	/** ThreadRequest
 	*/
 	public sealed class ThreadRequest<REQUESTITEM>
-		where REQUESTITEM : struct
+		where REQUESTITEM : class
 	{
-		/** execute
-		*/
-		public Execute_Base<REQUESTITEM> execute;
-
 		/** requestlist
 		*/
 		public RequestList<REQUESTITEM> requestlist;
@@ -32,26 +28,20 @@ namespace BlueBack.ThreadRequest
 		*/
 		public ThreadRequest(in InitParam<REQUESTITEM> a_initparam)
 		{
-			//execute
-			this.execute = a_initparam.execute;
-
 			//thread
-			this.thread = new Thread<REQUESTITEM>(this.execute);
+			this.thread = new Thread<REQUESTITEM>();
 
 			//requestlist
 			this.requestlist = new RequestList<REQUESTITEM>(this.thread);
 
 			//Start
-			this.thread.Start(this.requestlist);
+			this.thread.Start(this.requestlist,a_initparam.execute,a_initparam.context);
 		}
 
 		/** [System.IDisposable]破棄。
 		*/
 		public void Dispose()
 		{
-			//execute
-			this.execute = null;
-
 			//thread
 			this.thread.Dispose();
 			this.thread = null;
