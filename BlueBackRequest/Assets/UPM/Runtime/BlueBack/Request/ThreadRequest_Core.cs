@@ -207,20 +207,21 @@ namespace BlueBack.Request
 					}
 				}
 
-				//Inner_AfterContextExecute
+				//応答待ちしない。
 				if(t_item != null){
-					if(this.context != null){
-						try{
-							System.Threading.Thread.MemoryBarrier();
+					try{
+						if(this.context != null){
 							this.context.Post(this.Inner_AfterContextExecute,t_item);
-						}catch(System.Exception t_exception){
-							#if(DEF_BLUEBACK_REQUEST_ASSERT)
-							DebugTool.Assert(false,t_exception.Message);
-							#endif
-
-							//スレッド終了。
-							break;
+						}else{
+							System.Threading.Thread.MemoryBarrier();
 						}
+					}catch(System.Exception t_exception){
+						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						DebugTool.Assert(false,t_exception.Message);
+						#endif
+
+						//スレッド終了。
+						break;
 					}
 				}
 
@@ -241,8 +242,6 @@ namespace BlueBack.Request
 				}
 			}while(System.Threading.Interlocked.Read(ref this.cancel) == 0);
 			#pragma warning restore
-
-
 		}
 	}
 }
