@@ -29,7 +29,7 @@ namespace BlueBack.Request
 		public ThreadRequest(in ThreadRequest_InitParam<ITEM> a_initparam)
 		{
 			//core
-			this.core = new ThreadRequest_Core<ITEM>();
+			this.core = new ThreadRequest_Core<ITEM>(in a_initparam);
 
 			//list
 			this.list = new ThreadRequest_List<ITEM>(this.core);

@@ -16,6 +16,10 @@ namespace BlueBack.Request
 	public sealed class CoroutineRequest_List<ITEM> : System.IDisposable
 		where ITEM : class
 	{
+		/** lockobject
+		*/
+		public object lockobject;
+
 		/** list
 		*/
 		public System.Collections.Generic.Queue<ITEM> list;
@@ -24,6 +28,9 @@ namespace BlueBack.Request
 		*/
 		public CoroutineRequest_List()
 		{
+			//lockobject
+			this.lockobject = new object();
+
 			//list
 			this.list = new System.Collections.Generic.Queue<ITEM>();
 		}
@@ -44,7 +51,9 @@ namespace BlueBack.Request
 		public void Enqueue(ITEM a_item)
 		{
 			//Enqueue
-			this.list.Enqueue(a_item);
+			lock(this.lockobject){
+				this.list.Enqueue(a_item);
+			}
 		}
 
 		/** 取得。
@@ -54,8 +63,10 @@ namespace BlueBack.Request
 		*/
 		public ITEM Dequeue()
 		{
-			if(this.list.Count > 0){
-				return this.list.Dequeue();
+			lock(this.lockobject){
+				if(this.list.Count > 0){
+					return this.list.Dequeue();
+				}
 			}
 
 			return null;

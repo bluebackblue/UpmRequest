@@ -40,13 +40,21 @@ namespace BlueBack.Request
 		*/
 		public System.Threading.ManualResetEvent manualresetevent;
 
-		/** raw
+		/** thread
 		*/
-		public System.Threading.Thread raw;
+		public System.Threading.Thread thread;
+
+		/** coremask
+		*/
+		public System.UInt64 coremask;
+
+		/** threadpriority
+		*/
+		public ThreadPriority threadpriority;
 
 		/** constructor
 		*/
-		public ThreadRequest_Core()
+		public ThreadRequest_Core(in ThreadRequest_InitParam<ITEM> a_initparam)
 		{
 			//list
 			this.list = null;
@@ -66,8 +74,14 @@ namespace BlueBack.Request
 			//manualresetevent
 			this.manualresetevent = new System.Threading.ManualResetEvent(false);
 
-			//raw
-			this.raw = new System.Threading.Thread(this.Inner_ThreadMain);
+			//thread
+			this.thread = null;
+
+			//coremask
+			this.coremask = a_initparam.coremask;
+
+			//threadpriority
+			this.threadpriority = a_initparam.threadpriority;
 		}
 
 		/** [System.IDisposable]破棄。
@@ -81,18 +95,27 @@ namespace BlueBack.Request
 			this.Wakeup();
 
 			//raw
-			this.raw.Join();
-			this.raw.Abort();
-			this.raw = null;
-
-			//lockobject
-			this.lockobject = null;
+			this.thread.Join();
+			this.thread.Abort();
+			this.thread = null;
 
 			//list
 			this.list = null;
 
 			//execute
 			this.execute = null;
+
+			//this.context
+			this.context = null;
+
+			//lockobject
+			this.lockobject = null;
+
+			//cancel
+			this.cancel = 0;
+
+			//manualresetevent
+			this.manualresetevent.Dispose();
 		}
 
 		/** スレッド。開始。
@@ -109,7 +132,8 @@ namespace BlueBack.Request
 			this.context = a_initparam.context;
 
 			//Start
-			this.raw.Start();
+			this.thread = new System.Threading.Thread(this.Inner_ThreadMain);
+			this.thread.Start();
 		}
 
 		/** スレッド。復帰。
@@ -151,6 +175,35 @@ namespace BlueBack.Request
 		*/
 		private void Inner_ThreadMain()
 		{
+			#if((UNITY_STANDALONE_WIN)||(UNITY_EDITOR_WIN))
+			{
+				//GetCurrentThreadId
+				DebugTool.EditorLog(string.Format("id = {0} mask = {1} priority = {2}",WinKernel32.GetCurrentThreadId(),this.coremask,this.threadpriority));
+
+				uint t_handle = WinKernel32.GetCurrentThread();
+
+				if(this.coremask != 0){
+					WinKernel32.SetThreadAffinityMask(t_handle,(uint)this.coremask);
+				}
+
+				switch(this.threadpriority){
+				case ThreadPriority.Low:
+					{
+						WinKernel32.SetThreadPriority(t_handle,WinKernel32.THREAD_PRIORITY_BELOW_NORMAL);
+					}break;
+				case ThreadPriority.High:
+					{
+						WinKernel32.SetThreadPriority(t_handle,WinKernel32.THREAD_PRIORITY_ABOVE_NORMAL);
+					}break;
+				case ThreadPriority.Middle:
+				default:
+					{
+						WinKernel32.SetThreadPriority(t_handle,WinKernel32.THREAD_PRIORITY_NORMAL);
+					}break;
+				}
+			}
+			#endif
+
 			#pragma warning disable 0168
 			do{
 				try{

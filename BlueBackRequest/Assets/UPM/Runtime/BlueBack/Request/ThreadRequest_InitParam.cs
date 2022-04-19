@@ -24,6 +24,14 @@ namespace BlueBack.Request
 		*/
 		public ThreadRequest_Execute_Base<ITEM> execute;
 
+		/** coremask
+		*/
+		public System.UInt64 coremask;
+
+		/** threadpriority
+		*/
+		public ThreadPriority threadpriority;
+
 		/** CreateDefault
 		*/
 		public static ThreadRequest_InitParam<ITEM> CreateDefault()
@@ -31,6 +39,8 @@ namespace BlueBack.Request
 			return new ThreadRequest_InitParam<ITEM>(){
 				context = System.Threading.SynchronizationContext.Current,
 				execute = null,
+				coremask = 0,
+				threadpriority = ThreadPriority.Middle,
 			};
 		}
 	}
