@@ -178,7 +178,9 @@ namespace BlueBack.Request
 			#if((UNITY_STANDALONE_WIN)||(UNITY_EDITOR_WIN))
 			{
 				//GetCurrentThreadId
-				DebugTool.EditorLog(string.Format("id = {0} mask = {1} priority = {2}",WinKernel32.GetCurrentThreadId(),this.coremask,this.threadpriority));
+				#if(DEF_BLUEBACK_REQUEST_LOG)
+				DebugTool.Log(string.Format("id = {0} mask = {1} priority = {2}",WinKernel32.GetCurrentThreadId(),this.coremask,this.threadpriority));
+				#endif
 
 				uint t_handle = WinKernel32.GetCurrentThread();
 
