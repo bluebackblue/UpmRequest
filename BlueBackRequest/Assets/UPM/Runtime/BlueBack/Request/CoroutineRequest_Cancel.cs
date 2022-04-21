@@ -17,7 +17,32 @@ namespace BlueBack.Request
 	{
 		/** value
 		*/
-		public volatile int value;
+		private volatile int value;
+
+		/** constructor
+		*/
+		public CoroutineRequest_Cancel(int a_value)
+		{
+			this.value = a_value;
+			System.Threading.Thread.MemoryBarrier();
+		}
+
+		/** Set
+		*/
+		public void Set(int a_value)
+		{
+			this.value = a_value;
+			System.Threading.Thread.MemoryBarrier();
+		}
+
+		/** Get
+		*/
+		public int Get()
+		{
+			int t_value = this.value;
+			System.Threading.Thread.MemoryBarrier();
+			return t_value;
+		}
 	}
 }
 

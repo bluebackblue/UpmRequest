@@ -46,7 +46,7 @@ namespace BlueBack.Request
 			this.monobehaviour = null;
 
 			//cancel
-			this.cancel = new CoroutineRequest_Cancel(){value = 0};
+			this.cancel = new CoroutineRequest_Cancel(0);
 		}
 
 		/** [System.IDisposable]破棄。
@@ -54,7 +54,7 @@ namespace BlueBack.Request
 		public void Dispose()
 		{
 			//cancel
-			this.cancel.value = 1;
+			this.cancel.Set(1);
 
 			//monobehaviour
 			this.monobehaviour = null;
@@ -117,7 +117,7 @@ namespace BlueBack.Request
 					yield return null;
 				}
 
-			}while(this.cancel.value == 0);
+			}while(this.cancel.Get() == 0);
 			#pragma warning restore
 
 			yield break;
