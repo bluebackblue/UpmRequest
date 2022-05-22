@@ -147,6 +147,7 @@ namespace BlueBack.Request
 		public bool Wakeup()
 		{
 			lock(this.wakeup_lockobject){
+				#pragma warning disable 0168
 				try{
 					if(this.manualresetevent.Set() == true){
 						return true;
@@ -160,6 +161,7 @@ namespace BlueBack.Request
 					DebugTool.Assert(false,t_exception.Message);
 					#endif
 				}
+				#pragma warning restore
 			}
 
 			return false;
