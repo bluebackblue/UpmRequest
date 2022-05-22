@@ -32,7 +32,7 @@ namespace BlueBack.Request
 		*/
 		public ThreadRequest_List(ThreadRequest_Core<ITEM> a_core)
 		{
-			//core
+			//[cache]core
 			this.core = a_core;
 
 			//list

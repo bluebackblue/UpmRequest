@@ -36,7 +36,7 @@ namespace BlueBack.Request
 		*/
 		public CoroutineRequest_Core()
 		{
-			//list
+			//[cache]list
 			this.list = null;
 
 			//execute
@@ -70,7 +70,7 @@ namespace BlueBack.Request
 		*/
 		public void Start(CoroutineRequest_List<ITEM> a_list,in CoroutineRequest_InitParam<ITEM> a_initparam)
 		{
-			//list
+			//[cache]list
 			this.list = a_list;
 
 			//execute
