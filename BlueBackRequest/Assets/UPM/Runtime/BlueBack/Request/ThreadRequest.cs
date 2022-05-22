@@ -18,11 +18,11 @@ namespace BlueBack.Request
 	{
 		/** list
 		*/
-		public ThreadRequest_List<ITEM> list;
+		private ThreadRequest_List<ITEM> list;
 
 		/** core
 		*/
-		public ThreadRequest_Core<ITEM> core;
+		private ThreadRequest_Core<ITEM> core;
 
 		/** constructor
 		*/

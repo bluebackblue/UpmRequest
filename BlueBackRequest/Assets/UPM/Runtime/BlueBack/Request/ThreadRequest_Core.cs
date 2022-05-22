@@ -18,39 +18,39 @@ namespace BlueBack.Request
 	{
 		/** [cache]list
 		*/
-		public ThreadRequest_List<ITEM> list;
+		private ThreadRequest_List<ITEM> list;
 
 		/** execute
 		*/
-		public ThreadRequest_Execute_Base<ITEM> execute;
+		private ThreadRequest_Execute_Base<ITEM> execute;
 
 		/** context
 		*/
-		public System.Threading.SynchronizationContext context;
+		private System.Threading.SynchronizationContext context;
 
-		/** lockobject
+		/** wakeup_lockobject
 		*/
-		public object lockobject;
+		private object wakeup_lockobject;
 
 		/** cancel
 		*/
-		public long cancel;
+		private long cancel;
 
 		/** manualresetevent
 		*/
-		public System.Threading.ManualResetEvent manualresetevent;
+		private System.Threading.ManualResetEvent manualresetevent;
 
 		/** thread
 		*/
-		public System.Threading.Thread thread;
+		private System.Threading.Thread thread;
 
 		/** coremask
 		*/
-		public System.UInt64 coremask;
+		private System.UInt64 coremask;
 
 		/** threadpriority
 		*/
-		public ThreadPriority threadpriority;
+		private ThreadPriority threadpriority;
 
 		/** constructor
 		*/
@@ -65,8 +65,8 @@ namespace BlueBack.Request
 			//context
 			this.context = null;
 
-			//lockobject
-			this.lockobject = new object();
+			//wakeup_lockobject
+			this.wakeup_lockobject = new object();
 
 			//cancel
 			this.cancel = 0;
@@ -94,12 +94,12 @@ namespace BlueBack.Request
 			//Wakeup
 			this.Wakeup();
 
-			//raw
+			//thread
 			this.thread.Join();
 			this.thread.Abort();
 			this.thread = null;
 
-			//list
+			//[cache]list
 			this.list = null;
 
 			//execute
@@ -108,14 +108,17 @@ namespace BlueBack.Request
 			//this.context
 			this.context = null;
 
-			//lockobject
-			this.lockobject = null;
+			//wakeup_lockobject
+			this.wakeup_lockobject = null;
 
 			//cancel
 			this.cancel = 0;
 
 			//manualresetevent
-			this.manualresetevent.Dispose();
+			if(this.manualresetevent != null){
+				this.manualresetevent.Dispose();
+				this.manualresetevent = null;
+			}
 		}
 
 		/** スレッド。開始。
@@ -143,8 +146,7 @@ namespace BlueBack.Request
 		*/
 		public bool Wakeup()
 		{
-			#pragma warning disable 0168
-			lock(this.lockobject){
+			lock(this.wakeup_lockobject){
 				try{
 					if(this.manualresetevent.Set() == true){
 						return true;
@@ -159,7 +161,6 @@ namespace BlueBack.Request
 					#endif
 				}
 			}
-			#pragma warning restore
 
 			return false;
 		}
@@ -280,10 +281,10 @@ namespace BlueBack.Request
 					}
 				}
 
-				//Reset
+				//Wakeupを禁止してからリセットチェックを行う。
 				try{
-					lock(this.lockobject){
-						if(this.list.list.Count == 0){
+					lock(this.wakeup_lockobject){
+						if(this.list.GetCount() == 0){
 							this.manualresetevent.Reset();
 						}
 					}

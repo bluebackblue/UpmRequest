@@ -18,11 +18,15 @@ namespace BlueBack.Request
 	{
 		/** [cache]core
 		*/
-		public ThreadRequest_Core<ITEM> core;
+		private ThreadRequest_Core<ITEM> core;
 
 		/** list
 		*/
-		public System.Collections.Generic.Queue<ITEM> list;
+		private System.Collections.Generic.Queue<ITEM> list;
+
+		/** lockobject
+		*/
+		private object lockobject;
 
 		/** constructor
 		*/
@@ -33,13 +37,19 @@ namespace BlueBack.Request
 
 			//list
 			this.list = new System.Collections.Generic.Queue<ITEM>();
+
+			//lockobject
+			this.lockobject = new object();
 		}
 
 		/** [System.IDisposable]破棄。
 		*/
 		public void Dispose()
 		{
-			//core
+			//lockobject
+			this.lockobject = null;
+
+			//[cache]core
 			this.core = null;
 
 			//list
@@ -54,7 +64,7 @@ namespace BlueBack.Request
 		public void Enqueue(ITEM a_item)
 		{
 			//Enqueue
-			lock(this.core.lockobject){
+			lock(this.lockobject){
 				this.list.Enqueue(a_item);
 			}
 
@@ -69,13 +79,22 @@ namespace BlueBack.Request
 		*/
 		public ITEM Dequeue()
 		{
-			lock(this.core.lockobject){
+			lock(this.lockobject){
 				if(this.list.Count > 0){
 					return this.list.Dequeue();
 				}
 			}
 
 			return null;
+		}
+
+		/** GetCount
+		*/
+		public int GetCount()
+		{
+			lock(this.lockobject){
+				return this.list.Count;
+			}
 		}
 	}
 }

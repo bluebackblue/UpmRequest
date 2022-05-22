@@ -18,11 +18,11 @@ namespace BlueBack.Request
 	{
 		/** list
 		*/
-		public CoroutineRequest_List<ITEM> list;
+		private CoroutineRequest_List<ITEM> list;
 
 		/** core
 		*/
-		public CoroutineRequest_Core<ITEM> core;
+		private CoroutineRequest_Core<ITEM> core;
 
 		/** constructor
 		*/

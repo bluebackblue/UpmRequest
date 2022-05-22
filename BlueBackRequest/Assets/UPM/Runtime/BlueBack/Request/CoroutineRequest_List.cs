@@ -18,11 +18,11 @@ namespace BlueBack.Request
 	{
 		/** lockobject
 		*/
-		public object lockobject;
+		private object lockobject;
 
 		/** list
 		*/
-		public System.Collections.Generic.Queue<ITEM> list;
+		private System.Collections.Generic.Queue<ITEM> list;
 
 		/** constructor
 		*/
@@ -39,6 +39,9 @@ namespace BlueBack.Request
 		*/
 		public void Dispose()
 		{
+			//lockobject
+			this.lockobject = null;
+
 			//list
 			if(this.list != null){
 				this.list.Clear();

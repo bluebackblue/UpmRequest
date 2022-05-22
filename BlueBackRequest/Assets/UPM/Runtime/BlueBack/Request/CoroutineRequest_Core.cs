@@ -18,19 +18,19 @@ namespace BlueBack.Request
 	{
 		/** [cache]list
 		*/
-		public CoroutineRequest_List<ITEM> list;
+		private CoroutineRequest_List<ITEM> list;
 
 		/** execute
 		*/
-		public CoroutineRequest_Execute_Base<ITEM> execute;
+		private CoroutineRequest_Execute_Base<ITEM> execute;
 
 		/** monobehaviour
 		*/
-		public UnityEngine.MonoBehaviour monobehaviour;
+		private UnityEngine.MonoBehaviour monobehaviour;
 
 		/** cancel
 		*/
-		public CoroutineRequest_Cancel cancel;
+		private CoroutineRequest_Cancel cancel;
 
 		/** constructor
 		*/
@@ -59,7 +59,7 @@ namespace BlueBack.Request
 			//monobehaviour
 			this.monobehaviour = null;
 
-			//list
+			//[cache]list
 			this.list = null;
 
 			//execute
