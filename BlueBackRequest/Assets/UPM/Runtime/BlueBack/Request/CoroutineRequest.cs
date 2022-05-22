@@ -38,7 +38,7 @@ namespace BlueBack.Request
 			this.core.Start(this.list,in a_initparam);
 
 		}
-	
+
 		/** [System.IDisposable]破棄。
 		*/
 		public void Dispose()
