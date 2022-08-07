@@ -152,12 +152,12 @@ namespace BlueBack.Request
 					if(this.manualresetevent.Set() == true){
 						return true;
 					}else{
-						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						#if(DEF_BLUEBACK_ASSERT)
 						DebugTool.Assert(false,"error : Set");
 						#endif
 					}
 				}catch(System.Exception t_exception){
-					#if(DEF_BLUEBACK_REQUEST_ASSERT)
+					#if(DEF_BLUEBACK_ASSERT)
 					DebugTool.Assert(false,t_exception.Message);
 					#endif
 				}
@@ -181,7 +181,7 @@ namespace BlueBack.Request
 			#if((UNITY_STANDALONE_WIN)||(UNITY_EDITOR_WIN))
 			{
 				//GetCurrentThreadId
-				#if(DEF_BLUEBACK_REQUEST_LOG)
+				#if(DEF_BLUEBACK_LOG)
 				DebugTool.Log(string.Format("id = {0} mask = {1} priority = {2}",WinKernel32.GetCurrentThreadId(),this.coremask,this.threadpriority));
 				#endif
 
@@ -214,7 +214,7 @@ namespace BlueBack.Request
 				try{
 					if(this.manualresetevent.WaitOne() == true){
 					}else{
-						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						#if(DEF_BLUEBACK_ASSERT)
 						DebugTool.Assert(false,"error : WaitOne");
 						#endif
 
@@ -222,7 +222,7 @@ namespace BlueBack.Request
 						break;
 					}
 				}catch(System.Exception t_exception){
-					#if(DEF_BLUEBACK_REQUEST_ASSERT)
+					#if(DEF_BLUEBACK_ASSERT)
 					DebugTool.Assert(false,t_exception.Message);
 					#endif
 
@@ -237,7 +237,7 @@ namespace BlueBack.Request
 					try{
 						t_item = this.list.Dequeue();
 					}catch(System.Exception t_exception){
-						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						#if(DEF_BLUEBACK_ASSERT)
 						DebugTool.Assert(false,t_exception.Message);
 						#endif
 
@@ -255,7 +255,7 @@ namespace BlueBack.Request
 						try{
 							this.execute.ThreadExecute(t_item,ref this.cancel);
 						}catch(System.Exception t_exception){
-							#if(DEF_BLUEBACK_REQUEST_ASSERT)
+							#if(DEF_BLUEBACK_ASSERT)
 							DebugTool.Assert(false,t_exception.Message);
 							#endif
 
@@ -274,7 +274,7 @@ namespace BlueBack.Request
 							System.Threading.Thread.MemoryBarrier();
 						}
 					}catch(System.Exception t_exception){
-						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						#if(DEF_BLUEBACK_ASSERT)
 						DebugTool.Assert(false,t_exception.Message);
 						#endif
 
@@ -291,7 +291,7 @@ namespace BlueBack.Request
 						}
 					}
 				}catch(System.Exception t_exception){
-					#if(DEF_BLUEBACK_REQUEST_ASSERT)
+					#if(DEF_BLUEBACK_ASSERT)
 					DebugTool.Assert(false,t_exception.Message);
 					#endif
 

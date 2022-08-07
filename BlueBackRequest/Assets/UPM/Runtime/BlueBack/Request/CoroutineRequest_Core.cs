@@ -96,7 +96,7 @@ namespace BlueBack.Request
 					try{
 						t_item = this.list.Dequeue();
 					}catch(System.Exception t_exception){
-						#if(DEF_BLUEBACK_REQUEST_ASSERT)
+						#if(DEF_BLUEBACK_ASSERT)
 						DebugTool.Assert(false,t_exception.Message);
 						#endif
 

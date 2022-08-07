@@ -6,11 +6,11 @@ namespace BlueBack.Request.Samples.ThreadRequest
 {
 	/** Main_MonoBehaviour
 	*/
-	public class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.ThreadRequest_Execute_Base<Main_MonoBehaviour.Item>
+	public sealed class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.ThreadRequest_Execute_Base<Main_MonoBehaviour.Item>
 	{
 		/** Item
 		*/
-		public class Item
+		public sealed class Item
 		{
 			/** log
 			*/

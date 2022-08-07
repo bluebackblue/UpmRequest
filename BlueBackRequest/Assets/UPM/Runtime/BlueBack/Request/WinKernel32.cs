@@ -12,6 +12,8 @@
 #if((UNITY_STANDALONE_WIN)||(UNITY_EDITOR_WIN))
 namespace BlueBack.Request
 {
+	/** using
+	*/
 	using DWORD_PTR = System.UInt32; 
 	using DWORD = System.UInt32; 
 	using HANDLE = System.UInt32; 
