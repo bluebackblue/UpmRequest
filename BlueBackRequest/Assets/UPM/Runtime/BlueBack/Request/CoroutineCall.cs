@@ -90,7 +90,7 @@ namespace BlueBack.Request
 			if(this.execute != null){
 				yield return this.execute.CoroutineMain((PARAM)a_object);
 			}else{
-				#if(DEF_BLUEBACK_ASSERT)
+				#if(DEF_BLUEBACK_DEBUG_ASSERT)
 				DebugTool.Assert(false,"execute == null");
 				#endif
 			}
