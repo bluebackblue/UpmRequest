@@ -21,7 +21,7 @@ namespace BlueBack.Request
 
 		/** packageversion
 		*/
-		public const string packageversion = "0.0.14";
+		public const string packageversion = "0.0.15";
 
 		/** GetPackageVersion
 		*/
