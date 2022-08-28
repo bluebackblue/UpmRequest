@@ -3,7 +3,7 @@
 /**
 	Copyright (c) blueback
 	Released under the MIT License
-	@brief Request。リスト。
+	@brief Request。スレッド。リスト。
 */
 
 
@@ -20,26 +20,26 @@ namespace BlueBack.Request
 		*/
 		private ThreadRequest_Core<ITEM> core;
 
-		/** list
-		*/
-		private System.Collections.Generic.Queue<ITEM> list;
-
 		/** lockobject
 		*/
 		private object lockobject;
 
+		/** list
+		*/
+		private System.Collections.Generic.Queue<ITEM> list;
+
 		/** constructor
 		*/
-		public ThreadRequest_List(ThreadRequest_Core<ITEM> a_core)
+		public ThreadRequest_List()
 		{
 			//[cache]core
-			this.core = a_core;
-
-			//list
-			this.list = new System.Collections.Generic.Queue<ITEM>();
+			this.core = null;
 
 			//lockobject
 			this.lockobject = new object();
+
+			//list
+			this.list = new System.Collections.Generic.Queue<ITEM>();
 		}
 
 		/** [System.IDisposable]破棄。
@@ -49,14 +49,22 @@ namespace BlueBack.Request
 			//lockobject
 			this.lockobject = null;
 
-			//[cache]core
-			this.core = null;
-
 			//list
 			if(this.list != null){
 				this.list.Clear();
 				this.list = null;
 			}
+
+			//[cache]core
+			this.core = null;
+		}
+
+		/** SetCore
+		*/
+		public void SetCore(ThreadRequest_Core<ITEM> a_core)
+		{
+			//[cache]core
+			this.core = a_core;
 		}
 
 		/** 設定。

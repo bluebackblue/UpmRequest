@@ -11,31 +11,24 @@
 */
 namespace BlueBack.Request
 {
-	/** CoroutineRequest
+	/** CoroutineOnceRequest
 	*/
-	public sealed class CoroutineRequest<ITEM> : System.IDisposable
+	public sealed class CoroutineOnceRequest<ITEM> : System.IDisposable
 		where ITEM : class
 	{
-		/** list
-		*/
-		private CoroutineRequest_List<ITEM> list;
-
 		/** core
 		*/
-		private CoroutineRequest_Core<ITEM> core;
+		private CoroutineOnceRequest_Core<ITEM> core;
 
 		/** constructor
 		*/
-		public CoroutineRequest(in CoroutineRequest_InitParam<ITEM> a_initparam)
+		public CoroutineOnceRequest(in CoroutineOnceRequest_InitParam<ITEM> a_initparam)
 		{
-			//list
-			this.list = new CoroutineRequest_List<ITEM>();
-
 			//core
-			this.core = new CoroutineRequest_Core<ITEM>(in a_initparam,this.list);
+			this.core = new CoroutineOnceRequest_Core<ITEM>(in a_initparam);
 		}
 
-		/** [System.IDisposable]破棄。
+		/** [System.IDisposable]Dispose
 		*/
 		public void Dispose()
 		{
@@ -44,19 +37,28 @@ namespace BlueBack.Request
 				this.core.Dispose();
 				this.core = null;
 			}
-
-			//list
-			if(this.list != null){
-				this.list.Dispose();
-				this.list = null;
-			}
 		}
 
-		/** 発行。
+		/** Start
 		*/
-		public void Request(ITEM a_item)
+		public bool Start(ITEM a_item)
 		{
-			this.list.Enqueue(a_item);
+			//core
+			return this.core.Start(a_item);
+		}
+
+		/** End
+		*/
+		public System.Collections.IEnumerator End()
+		{
+			yield return this.core.End();
+		}
+
+		/** TryEnd
+		*/
+		public bool TryEnd()
+		{
+			return this.core.TryEnd();
 		}
 
 		/** SetCancelValue

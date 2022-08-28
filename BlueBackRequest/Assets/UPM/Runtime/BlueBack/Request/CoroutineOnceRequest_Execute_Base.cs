@@ -11,12 +11,12 @@
 */
 namespace BlueBack.Request
 {
-	/** CoroutineRequest_Execute_Base
+	/** CoroutineOnceRequest_Execute_Base
 	*/
-	public interface CoroutineRequest_Execute_Base<ITEM>
+	public interface CoroutineOnceRequest_Execute_Base<ITEM>
 		where ITEM : class
 	{
-		/** [BlueBack.Request.CoroutineRequest_Execute_Base<ITEM>]コルーチンから呼び出される。
+		/** [BlueBack.Request.CoroutineOnceRequest_Execute_Base<ITEM>]コルーチンから呼び出される。
 
 			a_cancel.Get() != 0 : キャンセルリクエストあり。
 

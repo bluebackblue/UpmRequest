@@ -12,14 +12,27 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 		*/
 		public sealed class Item
 		{
-			/** log
+			/** text
 			*/
-			public string log;
+			public string text;
 		}
 
-		/** coroutinerequest
+		/** request
 		*/
-		public BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item> coroutinerequest;
+		public BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item> request;
+
+		/** count
+		*/
+		public int count;
+
+		/** busy
+		*/
+		public bool busy;
+
+		/** cancel
+		*/
+		public bool cancel;
+		private bool cancel_old;
 
 		/** Awake
 		*/
@@ -32,74 +45,71 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 				t_initparam.monobehaviour = this;
 			}
 
-			//coroutinerequest
-			this.coroutinerequest = new BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item>(in t_initparam);
+			//request
+			this.request = new BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item>(in t_initparam);
 
-			//StartCoroutine
-			this.StartCoroutine(this.CoroutineMain());
+			//count
+			this.count = 0;
+
+			//busy
+			this.busy = false;
+
+			//cancel
+			this.cancel = false;
+			this.cancel_old = false;
 		}
 
-		/** CoroutineMain
+		/** Update
 		*/
-		public System.Collections.IEnumerator CoroutineMain()
+		private void Update()
 		{
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.coroutinerequest.Request(new Item(){
-				log = "log1",
-			});
-			UnityEngine.Debug.Log("Request : end");
+			if(this.cancel != this.cancel_old){
+				this.cancel_old = this.cancel;
+				this.request.SetCancelValue(this.cancel == true ? (long)1 : (long)0);
+			}
 
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.coroutinerequest.Request(new Item(){
-				log = "log2",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			yield return null;
-			yield return null;
-			yield return null;
-
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.coroutinerequest.Request(new Item(){
-				log = "log3",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.coroutinerequest.Request(new Item(){
-				log = "log4",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			yield break;
+			if(this.busy == false){
+				if(this.request.GetCancelValue() == 0){
+					this.busy = true;
+					this.count++;
+					this.request.Request(new Item(){text = this.count.ToString()});
+				}
+			}
 		}
 
 		/** OnDestroy
 		*/
 		private void OnDestroy()
 		{
-			//coroutinerequest
-			if(this.coroutinerequest != null){
-				this.coroutinerequest.Dispose();
-				this.coroutinerequest = null;
+			//request
+			if(this.request != null){
+				this.request.Dispose();
+				this.request = null;
 			}
 		}
 
-		/** [BlueBack.Request.CoroutineRequest_Execute_Base<ITEM>]CoroutineExecute
+		/** [BlueBack.Request.CoroutineRequest_Execute_Base<ITEM>]コルーチンから呼び出される。
 
-			a_cancel.value == 1 : キャンセルリクエストあり。
+			a_cancel.Get() != 0 : キャンセルリクエストあり。
 
 		*/
-		public System.Collections.IEnumerator CoroutineExecute(Main_MonoBehaviour.Item a_item,CoroutineRequest_Cancel a_cancel)
+		public System.Collections.IEnumerator CoroutineMain(Item a_item,BlueBack.Request.Cancel a_cancel)
 		{
-			yield return null;
+			if(a_cancel.Get() == 0){
+				UnityEngine.Debug.Log(a_item.text);
+			}
 
-			UnityEngine.Debug.Log(string.Format("CoroutineExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_item.log));
+			for(int ii=0;ii<100;ii++){
+				if(a_cancel.Get() == 0){
+					yield return new UnityEngine.WaitForSeconds(0.01f);
+				}else{
+					UnityEngine.Debug.Log("CoroutineMain : Cancel");
+					break;
+				}
+			}
 
+			//busy
+			this.busy = false;
 			yield break;
 		}
 	}

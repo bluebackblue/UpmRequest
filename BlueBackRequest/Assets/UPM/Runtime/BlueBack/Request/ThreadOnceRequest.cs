@@ -11,34 +11,24 @@
 */
 namespace BlueBack.Request
 {
-	/** ThreadRequest
+	/** ThreadOnceRequest
 	*/
-	public sealed class ThreadRequest<ITEM> : System.IDisposable
+	public sealed class ThreadOnceRequest<ITEM> : System.IDisposable
 		where ITEM : class
 	{
-		/** list
-		*/
-		private ThreadRequest_List<ITEM> list;
-
 		/** core
 		*/
-		private ThreadRequest_Core<ITEM> core;
+		private ThreadOnceRequest_Core<ITEM> core;
 
 		/** constructor
 		*/
-		public ThreadRequest(in ThreadRequest_InitParam<ITEM> a_initparam)
+		public ThreadOnceRequest(in ThreadOnceRequest_InitParam<ITEM> a_initparam)
 		{
-			//list
-			this.list = new ThreadRequest_List<ITEM>();
-
 			//core
-			this.core = new ThreadRequest_Core<ITEM>(in a_initparam,this.list);
-
-			//SetCore
-			this.list.SetCore(this.core);
+			this.core = new ThreadOnceRequest_Core<ITEM>(in a_initparam);
 		}
 
-		/** [System.IDisposable]破棄。
+		/** [System.IDisposable]Dispose
 		*/
 		public void Dispose()
 		{
@@ -47,19 +37,27 @@ namespace BlueBack.Request
 				this.core.Dispose();
 				this.core = null;
 			}
-
-			//list
-			if(this.list != null){
-				this.list.Dispose();
-				this.list = null;
-			}
 		}
 
-		/** 発行。
+		/** Start
 		*/
-		public void Request(ITEM a_item)
+		public bool Start(ITEM a_item)
 		{
-			this.list.Enqueue(a_item);
+			return this.core.Start(a_item);
+		}
+
+		/** End
+		*/
+		public void End()
+		{
+			this.core.End();
+		}
+
+		/** TryEnd
+		*/
+		public bool TryEnd()
+		{
+			return this.core.TryEnd();
 		}
 
 		/** SetCancelValue

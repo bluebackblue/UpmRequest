@@ -3,7 +3,7 @@
 /**
 	Copyright (c) blueback
 	Released under the MIT License
-	@brief Request。初期化パラメータ。
+	@brief Request。スレッド。
 */
 
 

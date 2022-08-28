@@ -3,7 +3,7 @@
 /**
 	Copyright (c) blueback
 	Released under the MIT License
-	@brief Request。リスト。
+	@brief Request。コルーチン。リスト。
 */
 
 
@@ -73,6 +73,15 @@ namespace BlueBack.Request
 			}
 
 			return null;
+		}
+
+		/** GetCount
+		*/
+		public int GetCount()
+		{
+			lock(this.lockobject){
+				return this.list.Count;
+			}
 		}
 	}
 }

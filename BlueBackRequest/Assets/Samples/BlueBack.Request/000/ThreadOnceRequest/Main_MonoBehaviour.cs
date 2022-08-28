@@ -1,12 +1,12 @@
 
 
-/** BlueBack.Request.Samples.ThreadRequest
+/** BlueBack.Request.Samples.ThreadOnceRequest
 */
-namespace BlueBack.Request.Samples.ThreadRequest
+namespace BlueBack.Request.Samples.ThreadOnceRequest
 {
 	/** Main_MonoBehaviour
 	*/
-	public sealed class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.ThreadRequest_Execute_Base<Main_MonoBehaviour.Item>
+	public sealed class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.ThreadOnceRequest_Execute_Base<Main_MonoBehaviour.Item>
 	{
 		/** Item
 		*/
@@ -19,7 +19,7 @@ namespace BlueBack.Request.Samples.ThreadRequest
 
 		/** request
 		*/
-		public BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item> request;
+		public BlueBack.Request.ThreadOnceRequest<Item> request;
 
 		/** count
 		*/
@@ -38,14 +38,14 @@ namespace BlueBack.Request.Samples.ThreadRequest
 		*/
 		private void Awake()
 		{
-			//initparam
-			BlueBack.Request.ThreadRequest_InitParam<Main_MonoBehaviour.Item> t_initparam = BlueBack.Request.ThreadRequest_InitParam<Main_MonoBehaviour.Item>.CreateDefault();
-			{
-				t_initparam.execute = this;
-			}
-
 			//request
-			this.request = new BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item>(in t_initparam);
+			{
+				BlueBack.Request.ThreadOnceRequest_InitParam<Item> t_initparam = BlueBack.Request.ThreadOnceRequest_InitParam<Item>.CreateDefault();
+				{
+					t_initparam.execute = this;
+				}
+				this.request = new ThreadOnceRequest<Item>(in t_initparam);
+			}
 
 			//count
 			this.count = 0;
@@ -64,35 +64,28 @@ namespace BlueBack.Request.Samples.ThreadRequest
 		{
 			if(this.cancel != this.cancel_old){
 				this.cancel_old = this.cancel;
-				this.request.SetCancelValue(this.cancel == true ? 1 : 0);
+				this.request.SetCancelValue(this.cancel == true ? (long)1 : (long)0);
 			}
 
 			if(this.busy == false){
 				if(this.request.GetCancelValue() == 0){
 					this.busy = true;
-					this.count++;
-					this.request.Request(new Item(){text = this.count.ToString()});
+					if(this.request.Start(new Item(){text = this.count.ToString()}) == true){
+						this.count++;
+					}else{
+						UnityEngine.Debug.LogError("error");
+						this.busy = false;
+					}
 				}
 			}
 		}
 
-		/** OnDestroy
-		*/
-		private void OnDestroy()
-		{
-			//request
-			if(this.request != null){
-				this.request.Dispose();
-				this.request = null;
-			}
-		}
-
-		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]スレッドから呼び出される。
+		/** [BlueBack.Request.ThreadOnceRequest_Execute_Base<ITEM>]スレッドから呼び出される。
 
 			a_cancel.Get() != 0 : キャンセルリクエストあり。
 
 		*/
-		public void ThreadMain(Main_MonoBehaviour.Item a_item,Cancel a_cancel)
+		public void ThreadMain(Item a_item,Cancel a_cancel)
 		{
 			if(a_cancel.Get() == 0){
 				UnityEngine.Debug.Log(a_item.text);
@@ -113,9 +106,19 @@ namespace BlueBack.Request.Samples.ThreadRequest
 
 		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]コンテキストから呼び出される。
 		*/
-		public void AfterContextMain(Main_MonoBehaviour.Item a_item)
+		public void AfterContextMain(Item a_item)
 		{
 			UnityEngine.Debug.Log(string.Format("AfterContextExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_item.text));
+		}
+
+		/** OnDestroy
+		*/
+		private void OnDestroy()
+		{
+			if(this.request != null){
+				this.request.Dispose();
+				this.request = null;
+			}
 		}
 	}
 }

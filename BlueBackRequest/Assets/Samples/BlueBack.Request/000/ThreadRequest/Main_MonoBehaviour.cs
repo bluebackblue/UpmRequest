@@ -12,14 +12,27 @@ namespace BlueBack.Request.Samples.ThreadRequest
 		*/
 		public sealed class Item
 		{
-			/** log
+			/** text
 			*/
-			public string log;
+			public string text;
 		}
 
-		/** threadrequest
+		/** request
 		*/
-		public BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item> threadrequest;
+		public BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item> request;
+
+		/** count
+		*/
+		public int count;
+
+		/** busy
+		*/
+		public bool busy;
+
+		/** cancel
+		*/
+		public bool cancel;
+		private bool cancel_old;
 
 		/** Awake
 		*/
@@ -31,79 +44,78 @@ namespace BlueBack.Request.Samples.ThreadRequest
 				t_initparam.execute = this;
 			}
 
-			//threadrequest
-			this.threadrequest = new BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item>(in t_initparam);
+			//request
+			this.request = new BlueBack.Request.ThreadRequest<Main_MonoBehaviour.Item>(in t_initparam);
 
-			//StartCoroutine
-			this.StartCoroutine(this.CoroutineMain());
+			//count
+			this.count = 0;
+
+			//busy
+			this.busy = false;
+
+			//cancel
+			this.cancel = false;
+			this.cancel_old = false;
 		}
 
-		/** CoroutineMain
+		/** Update
 		*/
-		public System.Collections.IEnumerator CoroutineMain()
+		private void Update()
 		{
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.threadrequest.Request(new Item(){
-				log = "log1",
-			});
-			UnityEngine.Debug.Log("Request : end");
+			if(this.cancel != this.cancel_old){
+				this.cancel_old = this.cancel;
+				this.request.SetCancelValue(this.cancel == true ? 1 : 0);
+			}
 
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.threadrequest.Request(new Item(){
-				log = "log2",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			yield return null;
-
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.threadrequest.Request(new Item(){
-				log = "log3",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			//Sleep
-			System.Threading.Thread.Sleep(1000);
-
-			//Request
-			UnityEngine.Debug.Log("Request : start");
-			this.threadrequest.Request(new Item(){
-				log = "log4",
-			});
-			UnityEngine.Debug.Log("Request : end");
-
-			yield break;
+			if(this.busy == false){
+				if(this.request.GetCancelValue() == 0){
+					this.busy = true;
+					this.count++;
+					this.request.Request(new Item(){text = this.count.ToString()});
+				}
+			}
 		}
 
 		/** OnDestroy
 		*/
 		private void OnDestroy()
 		{
-			//threadrequest
-			if(this.threadrequest != null){
-				this.threadrequest.Dispose();
-				this.threadrequest = null;
+			//request
+			if(this.request != null){
+				this.request.Dispose();
+				this.request = null;
 			}
 		}
 
-		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]ThreadExecute
+		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]スレッドから呼び出される。
 
-			System.Threading.Interlocked.Read(ref a_cancel) == 1 : キャンセルリクエストあり。
+			a_cancel.Get() != 0 : キャンセルリクエストあり。
 
 		*/
-		public void ThreadExecute(Main_MonoBehaviour.Item a_item,ref long a_cancel)
+		public void ThreadMain(Main_MonoBehaviour.Item a_item,Cancel a_cancel)
 		{
-			UnityEngine.Debug.Log(string.Format("ThreadExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_item.log));
+			if(a_cancel.Get() == 0){
+				UnityEngine.Debug.Log(a_item.text);
+			}
+
+			for(int ii=0;ii<100;ii++){
+				if(a_cancel.Get() == 0){
+					System.Threading.Thread.Sleep(10);
+				}else{
+					UnityEngine.Debug.Log("ThreadMain : Cancel");
+					break;
+				}
+			}
+
+			//busy
+			this.busy = false;
 		}
 
-		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]AfterContextExecute
+		/** [BlueBack.Request.ThreadRequest_Execute_Base<ITEM>]コンテキストから呼び出される。
 		*/
-		public void AfterContextExecute(Main_MonoBehaviour.Item a_item)
+		public void AfterContextMain(Main_MonoBehaviour.Item a_item)
 		{
-			UnityEngine.Debug.Log(string.Format("AfterContextExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_item.log));
+			UnityEngine.Debug.Log(string.Format("AfterContextExecute : {0} : {1}",System.Threading.Thread.CurrentThread.ManagedThreadId,a_item.text));
 		}
 	}
 }

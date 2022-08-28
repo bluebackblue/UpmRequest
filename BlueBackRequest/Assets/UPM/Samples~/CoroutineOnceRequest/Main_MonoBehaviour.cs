@@ -1,12 +1,12 @@
 
 
-/** BlueBack.Request.Samples.CoroutineRequest
+/** BlueBack.Request.Samples.CoroutineOnceRequest
 */
-namespace BlueBack.Request.Samples.CoroutineRequest
+namespace BlueBack.Request.Samples.CoroutineOnceRequest
 {
 	/** Main_MonoBehaviour
 	*/
-	public sealed class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.CoroutineRequest_Execute_Base<Main_MonoBehaviour.Item>
+	public sealed class Main_MonoBehaviour : UnityEngine.MonoBehaviour , BlueBack.Request.CoroutineOnceRequest_Execute_Base<Main_MonoBehaviour.Item>
 	{
 		/** Item
 		*/
@@ -19,7 +19,7 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 
 		/** request
 		*/
-		public BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item> request;
+		public BlueBack.Request.CoroutineOnceRequest<Item> request;
 
 		/** count
 		*/
@@ -38,15 +38,15 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 		*/
 		private void Awake()
 		{
-			//initparam
-			BlueBack.Request.CoroutineRequest_InitParam<Main_MonoBehaviour.Item> t_initparam = BlueBack.Request.CoroutineRequest_InitParam<Main_MonoBehaviour.Item>.CreateDefault();
-			{
-				t_initparam.execute = this;
-				t_initparam.monobehaviour = this;
-			}
-
 			//request
-			this.request = new BlueBack.Request.CoroutineRequest<Main_MonoBehaviour.Item>(in t_initparam);
+			{
+				BlueBack.Request.CoroutineOnceRequest_InitParam<Item> t_initparam = BlueBack.Request.CoroutineOnceRequest_InitParam<Item>.CreateDefault();
+				{
+					t_initparam.execute = this;
+					t_initparam.monobehaviour = this;
+				}
+				this.request = new BlueBack.Request.CoroutineOnceRequest<Item>(in t_initparam);
+			}
 
 			//count
 			this.count = 0;
@@ -71,24 +71,17 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 			if(this.busy == false){
 				if(this.request.GetCancelValue() == 0){
 					this.busy = true;
-					this.count++;
-					this.request.Request(new Item(){text = this.count.ToString()});
+					if(this.request.Start(new Item(){text = this.count.ToString()}) == true){
+						this.count++;
+					}else{
+						UnityEngine.Debug.LogError("error");
+						this.busy = false;
+					}
 				}
 			}
 		}
 
-		/** OnDestroy
-		*/
-		private void OnDestroy()
-		{
-			//request
-			if(this.request != null){
-				this.request.Dispose();
-				this.request = null;
-			}
-		}
-
-		/** [BlueBack.Request.CoroutineRequest_Execute_Base<ITEM>]コルーチンから呼び出される。
+		/** [BlueBack.Request.CoroutineOnceRequest_Execute_Base<ITEM>]コルーチンから呼び出される。
 
 			a_cancel.Get() != 0 : キャンセルリクエストあり。
 
@@ -111,6 +104,16 @@ namespace BlueBack.Request.Samples.CoroutineRequest
 			//busy
 			this.busy = false;
 			yield break;
+		}
+
+		/** OnDestroy
+		*/
+		private void OnDestroy()
+		{
+			if(this.request != null){
+				this.request.Dispose();
+				this.request = null;
+			}
 		}
 	}
 }

@@ -11,9 +11,9 @@
 */
 namespace BlueBack.Request
 {
-	/** ThreadRequest_InitParam
+	/** ThreadOnceRequest_InitParam
 	*/
-	public struct ThreadRequest_InitParam<ITEM>
+	public struct ThreadOnceRequest_InitParam<ITEM>
 		where ITEM : class
 	{
 		/** context
@@ -22,7 +22,7 @@ namespace BlueBack.Request
 
 		/** execute
 		*/
-		public ThreadRequest_Execute_Base<ITEM> execute;
+		public ThreadOnceRequest_Execute_Base<ITEM> execute;
 
 		/** coremask
 		*/
@@ -34,9 +34,9 @@ namespace BlueBack.Request
 
 		/** CreateDefault
 		*/
-		public static ThreadRequest_InitParam<ITEM> CreateDefault()
+		public static ThreadOnceRequest_InitParam<ITEM> CreateDefault()
 		{
-			return new ThreadRequest_InitParam<ITEM>(){
+			return new ThreadOnceRequest_InitParam<ITEM>(){
 				context = System.Threading.SynchronizationContext.Current,
 				execute = null,
 				coremask = 0,

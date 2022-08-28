@@ -11,9 +11,9 @@
 */
 namespace BlueBack.Request
 {
-	/** CoroutineRequest_InitParam
+	/** CoroutineOnceRequest_InitParam
 	*/
-	public struct CoroutineRequest_InitParam<ITEM>
+	public struct CoroutineOnceRequest_InitParam<ITEM>
 		where ITEM : class
 	{
 		/** monobehaviour
@@ -22,13 +22,13 @@ namespace BlueBack.Request
 
 		/** execute
 		*/
-		public CoroutineRequest_Execute_Base<ITEM> execute;
+		public CoroutineOnceRequest_Execute_Base<ITEM> execute;
 
 		/** CreateDefault
 		*/
-		public static CoroutineRequest_InitParam<ITEM> CreateDefault()
+		public static CoroutineOnceRequest_InitParam<ITEM> CreateDefault()
 		{
-			return new CoroutineRequest_InitParam<ITEM>(){
+			return new CoroutineOnceRequest_InitParam<ITEM>(){
 				monobehaviour = null,
 				execute = null,
 			};

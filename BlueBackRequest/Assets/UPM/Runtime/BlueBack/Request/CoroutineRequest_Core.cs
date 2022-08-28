@@ -3,7 +3,7 @@
 /**
 	Copyright (c) blueback
 	Released under the MIT License
-	@brief Request。
+	@brief Request。コルーチン。
 */
 
 
@@ -20,33 +20,40 @@ namespace BlueBack.Request
 		*/
 		private CoroutineRequest_List<ITEM> list;
 
+		/** cancel
+		*/
+		private Cancel cancel;
+
 		/** execute
 		*/
 		private CoroutineRequest_Execute_Base<ITEM> execute;
 
-		/** monobehaviour
+		/** coroutine_monobehaviour
 		*/
-		private UnityEngine.MonoBehaviour monobehaviour;
-
-		/** cancel
-		*/
-		private CoroutineRequest_Cancel cancel;
+		private UnityEngine.Coroutine coroutine;
+		private UnityEngine.MonoBehaviour coroutine_monobehaviour;
+		private long coroutine_end;
 
 		/** constructor
 		*/
-		public CoroutineRequest_Core()
+		public CoroutineRequest_Core(in CoroutineRequest_InitParam<ITEM> a_initparam,CoroutineRequest_List<ITEM> a_list)
 		{
 			//[cache]list
-			this.list = null;
-
-			//execute
-			this.execute = null;
-
-			//monobehaviour
-			this.monobehaviour = null;
+			this.list = a_list;
 
 			//cancel
-			this.cancel = new CoroutineRequest_Cancel(0);
+			this.cancel = new Cancel();
+
+			//execute
+			this.execute = a_initparam.execute;
+
+			//coroutine
+			{
+				this.coroutine = null;
+				this.coroutine_monobehaviour = a_initparam.monobehaviour;
+				this.coroutine_end = 0;
+				this.coroutine_monobehaviour.StartCoroutine(this.Inner_CoroutineMain());
+			}
 		}
 
 		/** [System.IDisposable]破棄。
@@ -56,8 +63,17 @@ namespace BlueBack.Request
 			//cancel
 			this.cancel.Set(1);
 
-			//monobehaviour
-			this.monobehaviour = null;
+			//coroutine_end
+			this.coroutine_end = 1;
+
+			//coroutine
+			{
+				if(this.coroutine != null){
+					this.coroutine_monobehaviour.StopCoroutine(this.coroutine);
+					this.coroutine = null;
+				}
+				this.coroutine_monobehaviour = null;
+			}
 
 			//[cache]list
 			this.list = null;
@@ -66,21 +82,19 @@ namespace BlueBack.Request
 			this.execute = null;
 		}
 
-		/** コルーチン。開始。
+		/** SetCancelValue
 		*/
-		public void Start(CoroutineRequest_List<ITEM> a_list,in CoroutineRequest_InitParam<ITEM> a_initparam)
+		public void SetCancelValue(long a_value)
 		{
-			//[cache]list
-			this.list = a_list;
+			//cancel
+			this.cancel.Set(a_value);
+		}
 
-			//execute
-			this.execute = a_initparam.execute;
-
-			//monobehaviour
-			this.monobehaviour = a_initparam.monobehaviour;
-
-			//StartCoroutine
-			this.monobehaviour.StartCoroutine(this.Inner_CoroutineMain());
+		/** GetCancelValue
+		*/
+		public long GetCancelValue()
+		{
+			return this.cancel.Get();
 		}
 
 		/** Inner_CoroutineMain
@@ -97,7 +111,7 @@ namespace BlueBack.Request
 						t_item = this.list.Dequeue();
 					}catch(System.Exception t_exception){
 						#if(DEF_BLUEBACK_DEBUG_ASSERT)
-						DebugTool.Assert(false,t_exception.Message);
+						DebugTool.Assert(false,t_exception);
 						#endif
 
 						//コルーチン終了。
@@ -108,16 +122,16 @@ namespace BlueBack.Request
 					break;
 				}
 
-				//CoroutineExecute
 				if(t_item != null){
+					//execute
 					if(this.execute != null){
-						yield return this.execute.CoroutineExecute(t_item,this.cancel);
+						yield return this.execute.CoroutineMain(t_item,this.cancel);
 					}
 				}else{
 					yield return null;
 				}
 
-			}while(this.cancel.Get() == 0);
+			}while(this.coroutine_end == 0);
 			#pragma warning restore
 
 			yield break;
